@@ -61,7 +61,7 @@ services:
       - ./docker_logs/db/db_dump.sql:/docker-entrypoint-initdb.d/init_dump.sql:ro
 
   rsyslog:
-    build: ./rsyslog
+    build: ./docker_logs/rsyslog
     depends_on: [ db ]
     restart: unless-stopped
     ports:
