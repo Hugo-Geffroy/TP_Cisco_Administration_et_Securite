@@ -1,0 +1,102 @@
+services:
+  ntp:
+    build:
+      context: ./docker-ntp-server/ntp
+      dockerfile: Dockerfile
+    image: local/chrony:alpine-3.20
+    container_name: ntp-server
+    restart: unless-stopped
+    ports:
+      - "123:123/udp"
+      - "323:323/udp"
+    volumes:
+      - ./docker-ntp-server/ntp/chrony.conf:/etc/chrony/chrony.conf:ro
+      - chrony-data:/var/lib/chrony
+    cap_add:
+      - SYS_TIME
+    healthcheck:
+      test: ["CMD-SHELL", "chronyc -n tracking >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  healthcheck:
+    build: ./docker-ntp-server/healthcheck
+    image: local/ntp-health:alpine-3.20
+    container_name: ntp-healthcheck
+    restart: unless-stopped
+    ports:
+      - "8123:80"
+    depends_on:
+      - ntp
+    environment:
+      - NTP_TARGET=ntp
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/status.txt | grep -Eq 'Leap status *: Normal|ERREUR'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  db:
+    image: mariadb:10.6
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_USER: user
+      MYSQL_PASSWORD: syslogpass
+      TZ: Europe/Paris
+    volumes:
+      - db_data:/var/lib/mysql
+      # création du schéma SystemEvents au 1er démarrage
+      - ./docker_logs/db/init_syslog.sql:/docker-entrypoint-initdb.d/init_syslog.sql:ro
+      - ./docker_logs/db/init_loganalyzer.sql:/docker-entrypoint-initdb.d/init_loganalyzer.sql:ro
+      - ./docker_logs/db/db_dump.sql:/docker-entrypoint-initdb.d/init_dump.sql:ro
+
+  rsyslog:
+    build: ./rsyslog
+    depends_on: [ db ]
+    restart: unless-stopped
+    ports:
+      - "514:514/udp"
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - ./docker_logs/rsyslog/rsyslog.conf:/etc/rsyslog.conf:ro
+
+  loganalyzer:
+    image: vsc55/loganalyzer:4.1.13
+    depends_on: [ db ]
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - ./docker_logs/loganalyzer/data:/data
+      - ./docker_logs/loganalyzer/entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: [ "sh", "/entrypoint.sh" ]
+    command: start
+
+  tftp:
+    build: .
+    container_name: serveur-tftp
+    image: mon-serveur-tftp
+    # Utilise directement le réseau de l'hôte. Simple, fiable et performant pour un labo.
+    network_mode: "host"
+    volumes:
+      # Le dossier ./tftp-data contiendra les fichiers, comme les configs du routeur.
+      - ./docker-tftpd/tftp-data:/srv/tftp
+    restart: unless-stopped
+
+
+volumes:
+  chrony-data:
+  db_data:

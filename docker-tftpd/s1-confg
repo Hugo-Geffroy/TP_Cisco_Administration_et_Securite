@@ -1,0 +1,191 @@
+
+!
+! Last configuration change at 12:43:45 CET Fri Sep 5 2025 by admin
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime localtime
+no service password-encryption
+!
+hostname S1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$CNb3$mOcEfAB9EEH/uPM1UjYfj.
+!
+username admin password 0 toto
+no aaa new-model
+clock timezone CET 1
+system mtu routing 1500
+ip subnet-zero
+!
+!
+ip domain-name ArmB.edgand.fr
+ip name-server 172.25.254.12
+!
+!
+crypto pki trustpoint TP-self-signed-1218707968
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1218707968
+ revocation-check none
+ rsakeypair TP-self-signed-1218707968
+!
+!
+crypto pki certificate chain TP-self-signed-1218707968
+ certificate self-signed 01
+  30820240 308201A9 A0030201 02020101 300D0609 2A864886 F70D0101 04050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31323138 37303739 3638301E 170D3933 30333031 30303031 
+  30325A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 32313837 
+  30373936 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100CD8C C0DB692C 9B8CDB91 24174AA1 CB956266 B4FD0E05 6EA9EA15 2E09D85A 
+  86A93875 5B890717 BD05944C 9C490B9C BBE251F2 72101B4D 89C58726 A44F82D9 
+  C54B67FC D25B4E0E 0F90463A 22CEAE97 764369CE 4D03A7F4 6F6DCCAF DFEE1D76 
+  2949B2F9 552434E9 133F8B0A 2A1EEFBD 85DA5A32 261CE053 EB492F26 E2EAE4BC 
+  6E7B0203 010001A3 68306630 0F060355 1D130101 FF040530 030101FF 30130603 
+  551D1104 0C300A82 086D742D 32393630 2E301F06 03551D23 04183016 801456C3 
+  3A6337B3 9081813D 714F9EE4 F5B15F16 424F301D 0603551D 0E041604 1456C33A 
+  6337B390 81813D71 4F9EE4F5 B15F1642 4F300D06 092A8648 86F70D01 01040500 
+  03818100 B5CE7D4C 68491056 01AFF8A0 AE0124B9 9B3063C1 27C20972 AC4E324E 
+  E6C9D16D CB5F951A D524A209 94A5E5F8 32C5F598 BC0EEC52 28D94730 6D000484 
+  97213D0A DC589FB2 EBEC61CA EF9E0057 24B27FB1 289E0D6C 22A19D43 7ACEA0B8 
+  139216DC 492C2538 13CC45BE 3EFBF66D 8EE7102C D4ED879E 1093013B 4FE707BF 58E19F2E
+  quit
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+ip ssh version 2
+!
+!
+interface FastEthernet0/1
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/2
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/3
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/4
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/5
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/6
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/7
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/8
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/9
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/10
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/11
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/12
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/13
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/14
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/15
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/16
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/17
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/18
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/19
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/20
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/21
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/22
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/23
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/24
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ ip address 172.25.192.254 255.255.0.0
+ no ip route-cache
+!
+ip http server
+ip http secure-server
+logging 172.25.192.55
+logging 172.25.192.35
+!
+control-plane
+!
+!
+line con 0
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login
+!
+ntp clock-period 36028954
+ntp server 172.25.192.35
+end
